@@ -1,0 +1,112 @@
+[
+  {
+    "id": "goa",
+    "name": "Goa",
+    "lat": 15.2993,
+    "lng": 74.124,
+    "tags": ["beach", "party", "coastal", "food"],
+    "min_age": 18,
+    "max_age": 80,
+    "biker_friendly": true,
+    "difficulty": "easy"
+  },
+  {
+    "id": "ladakh",
+    "name": "Ladakh",
+    "lat": 34.1526,
+    "lng": 77.5771,
+    "tags": ["mountain", "cold", "biker-paradise", "adventure"],
+    "min_age": 18,
+    "max_age": 60,
+    "biker_friendly": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "spiti",
+    "name": "Spiti Valley",
+    "lat": 32.2461,
+    "lng": 78.0348,
+    "tags": ["mountain", "cold", "biker-paradise", "remote"],
+    "min_age": 18,
+    "max_age": 60,
+    "biker_friendly": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "coorg",
+    "name": "Coorg",
+    "lat": 12.3375,
+    "lng": 75.8069,
+    "tags": ["hills", "coffee", "nature", "weekend"],
+    "min_age": 10,
+    "max_age": 80,
+    "biker_friendly": true,
+    "difficulty": "easy"
+  },
+  {
+    "id": "ooty",
+    "name": "Ooty",
+    "lat": 11.4064,
+    "lng": 76.6932,
+    "tags": ["hills", "scenic", "family", "cool"],
+    "min_age": 5,
+    "max_age": 85,
+    "biker_friendly": true,
+    "difficulty": "easy"
+  },
+  {
+    "id": "hampi",
+    "name": "Hampi",
+    "lat": 15.335,
+    "lng": 76.46,
+    "tags": ["heritage", "ruins", "history", "boulders"],
+    "min_age": 12,
+    "max_age": 80,
+    "biker_friendly": true,
+    "difficulty": "moderate"
+  },
+  {
+    "id": "tawang",
+    "name": "Tawang",
+    "lat": 27.5862,
+    "lng": 91.8694,
+    "tags": ["mountain", "monastery", "cold", "adventure"],
+    "min_age": 18,
+    "max_age": 65,
+    "biker_friendly": true,
+    "difficulty": "hard"
+  },
+  {
+    "id": "pondicherry",
+    "name": "Pondicherry",
+    "lat": 11.9416,
+    "lng": 79.8083,
+    "tags": ["coastal", "culture", "cafes", "relax"],
+    "min_age": 10,
+    "max_age": 85,
+    "biker_friendly": true,
+    "difficulty": "easy"
+  },
+  {
+    "id": "rishikesh",
+    "name": "Rishikesh",
+    "lat": 30.0869,
+    "lng": 78.2676,
+    "tags": ["river", "adventure", "yoga", "rafting"],
+    "min_age": 16,
+    "max_age": 70,
+    "biker_friendly": true,
+    "difficulty": "moderate"
+  },
+  {
+    "id": "andaman",
+    "name": "Andaman",
+    "lat": 11.7401,
+    "lng": 92.6586,
+    "tags": ["island", "beach", "diving", "nature"],
+    "min_age": 10,
+    "max_age": 75,
+    "biker_friendly": false,
+    "difficulty": "moderate"
+  }
+]

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="draw.io" modified="2026-04-01" agent="Wanderlust" version="21.0.0">
+  <diagram id="uml" name="UML Class Diagram">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="Wanderlust — UML Class Diagram" style="text;html=1;fontSize=20;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="10" width="500" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== TravelRecommender ===== -->
+        <mxCell id="cls_rec" value="&lt;p style='margin:0;padding:4px;'&gt;&lt;b&gt;«class»&lt;/b&gt;&lt;br/&gt;&lt;b&gt;TravelRecommender&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'/&gt;&lt;p style='margin:0;padding:4px;text-align:left;'&gt;- places: list[dict]&lt;br/&gt;- place_map: dict[str, dict]&lt;br/&gt;- embedding_model: FastEmbedEmbedding&lt;br/&gt;- index: VectorStoreIndex&lt;br/&gt;- graph: CompiledGraph&lt;/p&gt;&lt;hr size='1'/&gt;&lt;p style='margin:0;padding:4px;text-align:left;'&gt;+ __init__(data_path, persist_path)&lt;br/&gt;+ haversine_km(lat1, lon1, lat2, lon2): float&lt;br/&gt;+ recommend(profile, interactions, top_k): list&lt;br/&gt;- _build_graph(): CompiledGraph&lt;br/&gt;- _geo_filter_node(state): State&lt;br/&gt;- _profile_filter_node(state): State&lt;br/&gt;- _rank_node(state): State&lt;/p&gt;" style="verticalAlign=top;align=center;overflow=fill;fontSize=11;fontFamily=Helvetica;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="320" height="310" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== RecommendationState ===== -->
+        <mxCell id="cls_state" value="&lt;p style='margin:0;padding:4px;'&gt;&lt;b&gt;«TypedDict»&lt;/b&gt;&lt;br/&gt;&lt;b&gt;RecommendationState&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'/&gt;&lt;p style='margin:0;padding:4px;text-align:left;'&gt;+ user_profile: dict&lt;br/&gt;+ all_places: list[dict]&lt;br/&gt;+ interactions: list[dict]&lt;br/&gt;+ geo_candidates: list[dict]&lt;br/&gt;+ profile_candidates: list[dict]&lt;br/&gt;+ ranked_results: list[dict]&lt;/p&gt;" style="verticalAlign=top;align=center;overflow=fill;fontSize=11;fontFamily=Helvetica;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="80" y="440" width="280" height="180" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== Flask App (app.py) ===== -->
+        <mxCell id="cls_app" value="&lt;p style='margin:0;padding:4px;'&gt;&lt;b&gt;«module»&lt;/b&gt;&lt;br/&gt;&lt;b&gt;app (Flask)&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'/&gt;&lt;p style='margin:0;padding:4px;text-align:left;'&gt;+ SECRET_KEY: str&lt;br/&gt;+ TOKEN_SALT: str&lt;br/&gt;+ serializer: URLSafeTimedSerializer&lt;br/&gt;+ app: Flask&lt;br/&gt;+ recommender: TravelRecommender&lt;/p&gt;&lt;hr size='1'/&gt;&lt;p style='margin:0;padding:4px;text-align:left;'&gt;+ create_token(user_id): str&lt;br/&gt;+ decode_token(token): int | None&lt;br/&gt;+ get_current_user_id(): int | None&lt;br/&gt;+ health(): Response&lt;br/&gt;+ register(): Response&lt;br/&gt;+ login(): Response&lt;br/&gt;+ add_interaction(): Response&lt;br/&gt;+ cascade_recommendations(): Response&lt;br/&gt;+ demo_recommendations(): Response&lt;/p&gt;" style="verticalAlign=top;align=center;overflow=fill;fontSize=11;fontFamily=Helvetica;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="500" y="80" width="310" height="340" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== db module ===== -->
+        <mxCell id="cls_db" value="&lt;p style='margin:0;padding:4px;'&gt;&lt;b&gt;«module»&lt;/b&gt;&lt;br/&gt;&lt;b&gt;db&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'/&gt;&lt;p style='margin:0;padding:4px;text-align:left;'&gt;+ DB_PATH: Path&lt;/p&gt;&lt;hr size='1'/&gt;&lt;p style='margin:0;padding:4px;text-align:left;'&gt;+ get_connection(): Connection&lt;br/&gt;+ init_db(): None&lt;/p&gt;" style="verticalAlign=top;align=center;overflow=fill;fontSize=11;fontFamily=Helvetica;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="500" y="480" width="200" height="150" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== Frontend components ===== -->
+        <mxCell id="cls_appcomp" value="&lt;p style='margin:0;padding:4px;'&gt;&lt;b&gt;«React.FC»&lt;/b&gt;&lt;br/&gt;&lt;b&gt;App&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'/&gt;&lt;p style='margin:0;padding:4px;text-align:left;'&gt;- places: Place[]&lt;br/&gt;- authToken: string | null&lt;br/&gt;- selectedPlaceId: string | null&lt;br/&gt;- guestSuggestionCount: number&lt;/p&gt;&lt;hr size='1'/&gt;&lt;p style='margin:0;padding:4px;text-align:left;'&gt;+ handleAddPlace()&lt;br/&gt;+ handleGetSuggestions()&lt;br/&gt;+ handleLogin()&lt;br/&gt;+ handleRegister()&lt;/p&gt;" style="verticalAlign=top;align=center;overflow=fill;fontSize=11;fontFamily=Helvetica;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="900" y="80" width="250" height="240" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="cls_worldmap" value="&lt;b&gt;«React.FC» WorldMap&lt;/b&gt;&#xa;Props: places, onMapClick, onSelectPlace" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="880" y="370" width="240" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cls_sidebar" value="&lt;b&gt;«React.FC» Sidebar&lt;/b&gt;&#xa;Props: places, selectedPlaceId, onGetSuggestions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="880" y="430" width="280" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cls_addmodal" value="&lt;b&gt;«React.FC» AddPlaceModal&lt;/b&gt;&#xa;Props: coords, onAdd, onClose" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="880" y="490" width="240" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cls_authmodal" value="&lt;b&gt;«React.FC» AuthModal&lt;/b&gt;&#xa;Props: mode, onLogin, onRegister, onClose" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="880" y="550" width="260" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="cls_gemini" value="&lt;b&gt;«module» geminiService.ts&lt;/b&gt;&#xa;getTravelRecommendations(), loginUser(), registerUser()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="880" y="610" width="320" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Relationships -->
+        <!-- app uses TravelRecommender -->
+        <mxCell id="r1" value="" style="endArrow=diamondThin;endFill=1;endSize=12;" edge="1" source="cls_app" target="cls_rec" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- app uses db -->
+        <mxCell id="r2" value="" style="endArrow=open;endSize=12;dashed=1;" edge="1" source="cls_app" target="cls_db" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- TravelRecommender uses RecommendationState -->
+        <mxCell id="r3" value="" style="endArrow=open;endSize=12;dashed=1;" edge="1" source="cls_rec" target="cls_state" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- App component → children -->
+        <mxCell id="r4" value="" style="endArrow=open;endSize=8;" edge="1" source="cls_appcomp" target="cls_worldmap" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r5" value="" style="endArrow=open;endSize=8;" edge="1" source="cls_appcomp" target="cls_sidebar" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r6" value="" style="endArrow=open;endSize=8;" edge="1" source="cls_appcomp" target="cls_addmodal" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r7" value="" style="endArrow=open;endSize=8;" edge="1" source="cls_appcomp" target="cls_authmodal" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- App → geminiService (HTTP) -->
+        <mxCell id="r8" value="«calls»" style="endArrow=open;endSize=12;dashed=1;" edge="1" source="cls_appcomp" target="cls_gemini" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- geminiService → Flask app (REST) -->
+        <mxCell id="r9" value="REST API" style="endArrow=open;endSize=12;dashed=1;strokeColor=#FF0000;strokeWidth=2;" edge="1" source="cls_gemini" target="cls_app" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1040" y="680"/>
+              <mxPoint x="655" y="680"/>
+              <mxPoint x="655" y="420"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

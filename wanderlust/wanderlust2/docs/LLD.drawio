@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="draw.io" modified="2026-04-01" agent="Wanderlust" version="21.0.0">
+  <diagram id="lld" name="Low-Level Design">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="Wanderlust — Low-Level Design (LLD)" style="text;html=1;fontSize=20;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="10" width="500" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== BACKEND CLASSES ===== -->
+        <mxCell id="bg_backend" value="" style="rounded=1;dashed=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="620" height="520" as="geometry"/>
+        </mxCell>
+        <mxCell id="bg_backend_lbl" value="backend/" style="text;html=1;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="75" width="100" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- app.py module -->
+        <mxCell id="app_mod" value="&lt;b&gt;app.py&lt;/b&gt;&#xa;—————————————&#xa;+ SECRET_KEY: str&#xa;+ TOKEN_SALT: str&#xa;+ serializer: URLSafeTimedSerializer&#xa;+ app: Flask&#xa;+ recommender: TravelRecommender&#xa;—————————————&#xa;+ create_token(user_id) → str&#xa;+ decode_token(token) → int|None&#xa;+ get_current_user_id() → int|None&#xa;+ health() → JSON&#xa;+ register() → JSON&#xa;+ login() → JSON&#xa;+ add_interaction() → JSON&#xa;+ cascade_recommendations() → JSON&#xa;+ demo_recommendations() → JSON" style="shape=mxgraph.basic.rect;fillColor=#f8cecc;strokeColor=#b85450;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="110" width="260" height="270" as="geometry"/>
+        </mxCell>
+
+        <!-- db.py module -->
+        <mxCell id="db_mod" value="&lt;b&gt;db.py&lt;/b&gt;&#xa;—————————————&#xa;+ DB_PATH: Path&#xa;—————————————&#xa;+ get_connection() → Connection&#xa;+ init_db() → None&#xa;&#xa;Tables:&#xa;  users(id, username, email,&#xa;    password_hash, age, is_biker,&#xa;    home_city, home_lat, home_lng)&#xa;  interactions(id, user_id,&#xa;    place_id, interaction_type)" style="shape=mxgraph.basic.rect;fillColor=#fff2cc;strokeColor=#d6b656;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="400" width="260" height="180" as="geometry"/>
+        </mxCell>
+
+        <!-- recommender.py -->
+        <mxCell id="rec_mod" value="&lt;b&gt;recommender.py&lt;/b&gt;&#xa;—————————————&#xa;&lt;i&gt;TravelRecommender&lt;/i&gt;&#xa;- places: list[dict]&#xa;- place_map: dict[str, dict]&#xa;- embedding_model: FastEmbedEmbedding&#xa;- index: VectorStoreIndex&#xa;- graph: CompiledGraph&#xa;—————————————&#xa;+ __init__(data_path, persist_path)&#xa;+ haversine_km(lat1,lon1,lat2,lon2) → float&#xa;+ recommend(profile, interactions, top_k) → list&#xa;- _build_graph() → CompiledGraph&#xa;- _geo_filter_node(state) → state&#xa;- _profile_filter_node(state) → state&#xa;- _rank_node(state) → state&#xa;&#xa;&lt;i&gt;RecommendationState (TypedDict)&lt;/i&gt;&#xa;  user_profile, all_places,&#xa;  interactions, geo_candidates,&#xa;  profile_candidates, ranked_results" style="shape=mxgraph.basic.rect;fillColor=#d5e8d4;strokeColor=#82b366;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="370" y="110" width="270" height="340" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== FRONTEND COMPONENTS ===== -->
+        <mxCell id="bg_fe" value="" style="rounded=1;dashed=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="700" y="70" width="650" height="520" as="geometry"/>
+        </mxCell>
+        <mxCell id="bg_fe_lbl" value="Frontend (React Components)" style="text;html=1;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="710" y="75" width="280" height="25" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="comp_app" value="&lt;b&gt;App.tsx&lt;/b&gt;&#xa;—————————————&#xa;State: places, authToken,&#xa;  selectedPlaceId, modalCoords,&#xa;  guestSuggestionCount&#xa;—————————————&#xa;+ handleAddPlace()&#xa;+ handleGetSuggestions()&#xa;+ handleLogin()&#xa;+ handleRegister()&#xa;+ handleLogout()" style="shape=mxgraph.basic.rect;fillColor=#f8cecc;strokeColor=#b85450;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="850" y="110" width="200" height="190" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="comp_map" value="&lt;b&gt;WorldMap.tsx&lt;/b&gt;&#xa;—————————————&#xa;Props: places, onMapClick,&#xa;  onSelectPlace&#xa;—————————————&#xa;Renders: Leaflet markers&#xa;  + tile layer" style="shape=mxgraph.basic.rect;fillColor=#fff2cc;strokeColor=#d6b656;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="720" y="320" width="180" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="comp_sidebar" value="&lt;b&gt;Sidebar.tsx&lt;/b&gt;&#xa;—————————————&#xa;Props: places, selectedPlaceId,&#xa;  onSelectPlace, onGetSuggestions&#xa;—————————————&#xa;Renders: place cards list&#xa;  + suggestion button" style="shape=mxgraph.basic.rect;fillColor=#fff2cc;strokeColor=#d6b656;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="920" y="320" width="200" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="comp_addplace" value="&lt;b&gt;AddPlaceModal.tsx&lt;/b&gt;&#xa;—————————————&#xa;Props: coords, onAdd, onClose" style="shape=mxgraph.basic.rect;fillColor=#fff2cc;strokeColor=#d6b656;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="720" y="460" width="180" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="comp_auth" value="&lt;b&gt;AuthModal.tsx&lt;/b&gt;&#xa;—————————————&#xa;Props: mode, onLogin,&#xa;  onRegister, onClose" style="shape=mxgraph.basic.rect;fillColor=#fff2cc;strokeColor=#d6b656;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="920" y="460" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="svc_gemini" value="&lt;b&gt;geminiService.ts&lt;/b&gt;&#xa;—————————————&#xa;+ getTravelRecommendations()&#xa;+ loginUser()&#xa;+ registerUser()" style="shape=mxgraph.basic.rect;fillColor=#d5e8d4;strokeColor=#82b366;whiteSpace=wrap;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="320" width="190" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges: app → db, app → recommender -->
+        <mxCell id="e_app_db" value="calls" style="" edge="1" source="app_mod" target="db_mod" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_app_rec" value="calls" style="" edge="1" source="app_mod" target="rec_mod" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges: App → children -->
+        <mxCell id="e_app_map" value="" style="" edge="1" source="comp_app" target="comp_map" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_app_sb" value="" style="" edge="1" source="comp_app" target="comp_sidebar" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_app_svc" value="HTTP" style="" edge="1" source="comp_app" target="svc_gemini" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Frontend → Backend -->
+        <mxCell id="e_fe_be" value="REST API (port 5001)" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#FF0000;strokeWidth=2;" edge="1" source="svc_gemini" target="app_mod" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1235" y="600"/>
+              <mxPoint x="680" y="600"/>
+              <mxPoint x="680" y="245"/>
+              <mxPoint x="320" y="245"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,7 @@
+{
+  "name": "Wanderlust AI World Map",
+  "description": "A complete interactive world map to track your travels and plan your next adventures using AI recommendations.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

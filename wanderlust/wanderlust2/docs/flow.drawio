@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="draw.io" modified="2026-04-01" agent="Wanderlust" version="21.0.0">
+  <diagram id="flow" name="Execution Flow">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="Wanderlust — Execution Flow Diagram" style="text;html=1;fontSize=20;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="250" y="10" width="500" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Start -->
+        <mxCell id="start" value="START" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="60" width="100" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- 00: app.py bootstrap -->
+        <mxCell id="n00" value="00: app.py&#xa;Bootstrap Flask app&#xa;SECRET_KEY, CORS init" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="400" y="130" width="180" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_s_00" edge="1" source="start" target="n00" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- 01: init_db -->
+        <mxCell id="n01" value="01: db.py → init_db()&#xa;Create users &amp; interactions&#xa;tables in SQLite" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="400" y="220" width="180" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_00_01" edge="1" source="n00" target="n01" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- 02: recommender init -->
+        <mxCell id="n02" value="02: recommender.py&#xa;Load places.json&#xa;Build ChromaDB index&#xa;Compile LangGraph" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="400" y="310" width="180" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_01_02" edge="1" source="n01" target="n02" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Server listening -->
+        <mxCell id="n03" value="Flask server listening&#xa;0.0.0.0:5001" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="410" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_02_03" edge="1" source="n02" target="n03" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Request arrives -->
+        <mxCell id="req" value="HTTP Request&#xa;arrives" style="shape=parallelogram;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="405" y="490" width="170" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_03_req" edge="1" source="n03" target="req" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Decision: which endpoint? -->
+        <mxCell id="dec" value="Route?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="430" y="565" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_req_dec" edge="1" source="req" target="dec" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Auth branch -->
+        <mxCell id="auth_branch" value="/api/auth/*&#xa;Register / Login&#xa;→ SQLite read/write&#xa;→ Return token" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="160" y="560" width="180" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_dec_auth" value="auth" edge="1" source="dec" target="auth_branch" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Interaction branch -->
+        <mxCell id="int_branch" value="/api/interactions&#xa;Verify token&#xa;→ Insert to DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="160" y="660" width="180" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_dec_int" value="interaction" edge="1" source="dec" target="int_branch" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Recommendation pipeline -->
+        <mxCell id="rec_start" value="/api/recommendations/*&#xa;Verify token (cascade)&#xa;Load user profile" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="640" y="560" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_dec_rec" value="recommend" edge="1" source="dec" target="rec_start" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="geo" value="Step 1: geo_filter&#xa;Haversine distance&#xa;Exclude visited" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="640" y="650" width="200" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_rec_geo" edge="1" source="rec_start" target="geo" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="prof" value="Step 2: profile_filter&#xa;Age, biker, difficulty" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="640" y="730" width="200" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_geo_prof" edge="1" source="geo" target="prof" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="rank" value="Step 3: rank_candidates&#xa;Semantic + Tag + Distance&#xa;+ Social scoring" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="640" y="800" width="200" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_prof_rank" edge="1" source="prof" target="rank" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Response -->
+        <mxCell id="resp" value="JSON Response&#xa;to Frontend" style="shape=parallelogram;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="405" y="820" width="170" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_rank_resp" edge="1" source="rank" target="resp" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_auth_resp" edge="1" source="auth_branch" target="resp" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_int_resp" edge="1" source="int_branch" target="resp" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,158 @@
+{
+  "project_name": "Wanderlust Mobile",
+  "theme": "Earthy Dark Mode",
+  "archetype": "Organic & Earthy + Adventure",
+  "typography": {
+    "headings": {
+      "font_family": "Barlow Condensed, sans-serif",
+      "weights": ["600", "700", "800"],
+      "usage": "Headings, Hero Text, Card Titles"
+    },
+    "body": {
+      "font_family": "Manrope, sans-serif",
+      "weights": ["400", "500", "600"],
+      "usage": "Paragraphs, UI Elements, Labels"
+    }
+  },
+  "colors": {
+    "background": {
+      "primary": "#0f1715",
+      "secondary": "#1c2b29",
+      "card": "#243432",
+      "overlay": "rgba(15, 23, 21, 0.85)"
+    },
+    "brand": {
+      "primary": "#e8652b",
+      "primary_hover": "#d55620",
+      "secondary": "#6b8c7b",
+      "accent": "#d4a373"
+    },
+    "text": {
+      "primary": "#f0f4f3",
+      "secondary": "#8ca3a0",
+      "muted": "#5c706d",
+      "inverse": "#0f1715"
+    },
+    "status": {
+      "success": "#4ade80",
+      "error": "#ef4444",
+      "warning": "#f59e0b",
+      "info": "#3b82f6"
+    }
+  },
+  "layout_guidelines": {
+    "container": "max-w-[480px] mx-auto h-[100dvh] overflow-hidden bg-[#0f1715] relative shadow-2xl border-x border-[#243432]",
+    "spacing": {
+      "xs": "0.25rem",
+      "sm": "0.5rem",
+      "md": "1rem",
+      "lg": "1.5rem",
+      "xl": "2rem",
+      "xxl": "3rem"
+    },
+    "radius": {
+      "sm": "0.375rem",
+      "md": "0.75rem",
+      "lg": "1rem",
+      "full": "9999px"
+    },
+    "z_index": {
+      "map": 0,
+      "overlays": 10,
+      "floating_action": 20,
+      "navigation": 30,
+      "modal": 50,
+      "toast": 100
+    }
+  },
+  "components": {
+    "Map": {
+      "library": "react-leaflet",
+      "style_strategy": "CSS Filter Hack for Dark Mode",
+      "css_rules": ".leaflet-layer { filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%); } .leaflet-container { background: #0f1715; }",
+      "interactions": "Floating search bar at top, Locate Me FAB bottom-right",
+      "marker_color": "#e8652b"
+    },
+    "SwipeDeck": {
+      "structure": "Absolute positioned card stack",
+      "interaction": "Touch-based drag with rotation and opacity fade",
+      "feedback": "Like (Right) = Green Overlay, Nope (Left) = Red Overlay",
+      "card_style": "Full bleed image, gradient overlay at bottom for text readability, rounded-3xl"
+    },
+    "Navigation": {
+      "type": "Bottom Tab Bar",
+      "style": "Glassmorphism (backdrop-blur-md bg-[#0f1715]/90 border-t border-[#243432])",
+      "icons": "Lucide React (Map, Compass, List, User)",
+      "active_state": "text-[#e8652b]",
+      "inactive_state": "text-[#5c706d]"
+    }
+  },
+  "assets": {
+    "images": [
+      {
+        "category": "Kyoto, Japan",
+        "url": "https://images.unsplash.com/photo-1730731859180-03edef32ab71?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDR8MHwxfHNlYXJjaHwyfHxreW90byUyMGphcGFuJTIwc3RyZWV0JTIwbmlnaHR8ZW58MHx8fHwxNzczNTkyMzU4fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Narrow alleyway at night, atmospheric"
+      },
+      {
+        "category": "Banff, Canada",
+        "url": "https://images.unsplash.com/photo-1646726482391-74f245f1b51c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwzfHxiYW5mZiUyMG5hdGlvbmFsJTIwcGFyayUyMGxha2V8ZW58MHx8fHwxNzczNTkyMzU5fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Blue lake with mountains"
+      },
+      {
+        "category": "Santorini, Greece",
+        "url": "https://images.unsplash.com/photo-1656504862933-8d29a68a9492?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHwxfHxzYW50b3JpbmklMjBncmVlY2UlMjBzdW5zZXR8ZW58MHx8fHwxNzczNTkyMzYwfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Sunset over the caldera"
+      },
+      {
+        "category": "Patagonia, Chile",
+        "url": "https://images.unsplash.com/photo-1667759046521-85e3803601b7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHw0fHxwYXRhZ29uaWElMjBjaGlsZSUyMG1vdW50YWlucyUyMGhpa2luZ3xlbnwwfHx8fDE3NzM1OTIzNjB8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Snowy mountain peaks"
+      },
+      {
+        "category": "Profile Avatar",
+        "url": "https://images.unsplash.com/photo-1765530813405-d23f98fda0b4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwzfHxhZHZlbnR1cm91cyUyMHRyYXZlbGVyJTIwcG9ydHJhaXQlMjBiYWNrcGFja3xlbnwwfHx8fDE3NzM1OTIzNjN8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Traveler with backpack"
+      }
+    ],
+    "icons": {
+      "library": "lucide-react",
+      "mapping": {
+        "Map": "Map",
+        "Discover": "Compass",
+        "BucketList": "List",
+        "Profile": "User",
+        "Search": "Search",
+        "LocateMe": "Navigation",
+        "Close": "X",
+        "Heart": "Heart"
+      }
+    }
+  },
+  "instructions_to_main_agent": [
+    "INSTALL TAILWIND CSS IMMEDIATELY: `npm install -D tailwindcss postcss autoprefixer && npx tailwindcss init -p`.",
+    "Configure `tailwind.config.js` to include the custom colors defined in this file.",
+    "Install `clsx` and `tailwind-merge` for class management if not present.",
+    "Use the CSS Filter Hack for the Leaflet Map dark mode. Do NOT use an API key for map tiles.",
+    "Ensure the app is mobile-first by wrapping the entire application in a centered container with `max-w-md`.",
+    "Use `lucide-react` for all icons.",
+    "Implement the Swipe Deck with `framer-motion` if available, or standard CSS transforms + React state.",
+    "Mock all data (User, Destinations, Bucket List) in a separate `data/mock.ts` file.",
+    "Add `data-testid` to all interactive elements."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. Avoid this.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: `transition: all`. This results in breaking transforms.",
+    "You MUST NOT center align the app container global css. This disrupts the human natural reading flow of text.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations.",
+    "NEVER use AI assistant Emoji characters like 🤖 etc.",
+    "Use `sonner` for toasts if available.",
+    "Prioritize using pre-existing components from `src/components/ui` when applicable.",
+    "Components MUST use named exports.",
+    "Pages MUST use default exports."
+  ]
+}

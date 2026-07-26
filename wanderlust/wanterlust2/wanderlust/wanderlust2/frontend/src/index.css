@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a0f0d;
+  font-family: 'Manrope', sans-serif;
+  color: #f0f4f3;
+}
+
+/* Leaflet Dark Mode Filter */
+.leaflet-layer {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+.leaflet-container {
+  background: #0f1715 !important;
+}
+
+/* Remove leaflet default z-index conflicts */
+.leaflet-pane { z-index: 0 !important; }
+.leaflet-control { z-index: 5 !important; }
+.leaflet-top, .leaflet-bottom { z-index: 5 !important; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #243432;
+  border-radius: 2px;
+}
+
+/* Disable text selection on swipe cards */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Smooth page transitions */
+.screen-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.screen-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}

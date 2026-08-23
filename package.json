@@ -11,7 +11,6 @@
   "dependencies": {
     "lucide-react": "^0.554.0",
     "react-dom": "^19.2.0",
-    "@google/genai": "^1.30.0",
     "react": "^19.2.0",
     "leaflet": "^1.9.4",
     "react-leaflet": "^5.0.0"

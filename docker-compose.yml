@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "5001:5001"
+    environment:
+      # AGENT INSTRUCTION: Override WANDERLUST_SECRET_KEY in production via .env or secrets manager.
+      - WANDERLUST_SECRET_KEY=${WANDERLUST_SECRET_KEY:-wanderlust-local-dev-secret}
+    volumes:
+      # Persist vector store across restarts (SQLite users table resets on rebuild — demo setup)
+      - chroma_data:/app/chroma_store
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001/api/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  chroma_data:

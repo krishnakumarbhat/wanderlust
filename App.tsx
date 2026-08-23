@@ -7,8 +7,6 @@ import AuthModal from './components/AuthModal';
 import { getTravelRecommendations, loginUser, registerUser } from './services/geminiService';
 import { Menu } from 'lucide-react';
 
-const GUEST_SUGGESTION_LIMIT = 5;
-
 const App: React.FC = () => {
   // Load initial state from localStorage if available
   const [places, setPlaces] = useState<Place[]>(() => {
@@ -21,9 +19,6 @@ const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // For mobile/toggle
   const [isGenerating, setIsGenerating] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(() => localStorage.getItem('wanderlust_auth_token'));
-  const [guestSuggestionCount, setGuestSuggestionCount] = useState<number>(() => {
-    return Number(localStorage.getItem('wanderlust_guest_suggestions') || 0);
-  });
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -39,10 +34,6 @@ const App: React.FC = () => {
       localStorage.removeItem('wanderlust_auth_token');
     }
   }, [authToken]);
-
-  useEffect(() => {
-    localStorage.setItem('wanderlust_guest_suggestions', String(guestSuggestionCount));
-  }, [guestSuggestionCount]);
 
   const handleAddPlace = (name: string, status: PlaceStatus, notes: string) => {
     if (!modalCoords) return;
@@ -77,13 +68,6 @@ const App: React.FC = () => {
       return;
     }
 
-    if (!authToken && guestSuggestionCount >= GUEST_SUGGESTION_LIMIT) {
-      setAuthModalMode('login');
-      setIsAuthModalOpen(true);
-      alert('You used all 5 guest suggestions. Please login/register for unlimited suggestions.');
-      return;
-    }
-
     setIsGenerating(true);
     try {
       const recommendations = await getTravelRecommendations(places);
@@ -114,10 +98,6 @@ const App: React.FC = () => {
 
       setPlaces(prev => [...prev, ...newPlaces]);
 
-      if (!authToken) {
-        setGuestSuggestionCount((count) => count + 1);
-      }
-      
       // Optionally select the first new place to fly to it
       if (newPlaces.length > 0) {
         setSelectedPlaceId(newPlaces[0].id);
@@ -175,8 +155,6 @@ const App: React.FC = () => {
           onGenerateRecommendations={handleGenerateRecommendations}
           isGenerating={isGenerating}
           isLoggedIn={Boolean(authToken)}
-          guestSuggestionCount={guestSuggestionCount}
-          guestSuggestionLimit={GUEST_SUGGESTION_LIMIT}
           onOpenLogin={() => openAuthModal('login')}
           onOpenRegister={() => openAuthModal('register')}
           onLogout={handleLogout}

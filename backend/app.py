@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -13,7 +14,7 @@ from recommender import TravelRecommender
 
 
 BASE_DIR = Path(__file__).resolve().parent
-SECRET_KEY = "wanderlust-local-dev-secret"
+SECRET_KEY = os.environ.get("WANDERLUST_SECRET_KEY", "wanderlust-local-dev-secret")
 TOKEN_SALT = "wanderlust-auth"
 TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
 

@@ -1,0 +1,46 @@
+name: Bug report 🐛
+description: Report something broken or unexpected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a bug!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, including what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. See error
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Frontend (React/map)
+        - Backend (Flask/API)
+        - Recommender pipeline
+        - Auth
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Environment
+      placeholder: OS, browser, Node/Python version
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Console output or screenshots if applicable.

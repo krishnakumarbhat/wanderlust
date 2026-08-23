@@ -11,8 +11,6 @@ interface SidebarProps {
   onGenerateRecommendations: () => void;
   isGenerating: boolean;
   isLoggedIn: boolean;
-  guestSuggestionCount: number;
-  guestSuggestionLimit: number;
   onOpenLogin: () => void;
   onOpenRegister: () => void;
   onLogout: () => void;
@@ -26,8 +24,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   onGenerateRecommendations,
   isGenerating,
   isLoggedIn,
-  guestSuggestionCount,
-  guestSuggestionLimit,
   onOpenLogin,
   onOpenRegister,
   onLogout
@@ -64,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="mt-4">
           {isLoggedIn ? (
             <div className="flex items-center justify-between gap-2 bg-indigo-700/40 px-3 py-2 rounded-lg">
-              <span className="text-xs text-indigo-100">Logged in • Unlimited suggestions</span>
+              <span className="text-xs text-indigo-100">Logged in</span>
               <button
                 onClick={onLogout}
                 className="text-xs px-2 py-1 rounded bg-indigo-900/40 hover:bg-indigo-900/60"
@@ -149,11 +145,6 @@ const Sidebar: React.FC<SidebarProps> = ({
           <p className="text-xs text-slate-500 mt-2 text-center">
             Based on your visited and bucket-list places, we'll find better matches.
           </p>
-          {!isLoggedIn && (
-            <p className="text-xs text-slate-500 mt-1 text-center">
-              Guest uses: {guestSuggestionCount}/{guestSuggestionLimit}
-            </p>
-          )}
         </div>
       )}
 

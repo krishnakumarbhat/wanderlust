@@ -4,8 +4,9 @@ import WorldMap from './components/WorldMap';
 import Sidebar from './components/Sidebar';
 import AddPlaceModal from './components/AddPlaceModal';
 import AuthModal from './components/AuthModal';
-import { getTravelRecommendations, loginUser, registerUser } from './services/geminiService';
-import { Menu } from 'lucide-react';
+import { getTravelRecommendations, loginUser, registerUser, fetchSharedMap } from './services/geminiService';
+import { motion } from 'framer-motion';
+import { Menu, Eye } from 'lucide-react';
 
 const App: React.FC = () => {
   // Load initial state from localStorage if available
@@ -22,10 +23,36 @@ const App: React.FC = () => {
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+  // Dark mode
+  const [isDark, setIsDark] = useState<boolean>(() => localStorage.getItem('wanderlust_theme') === 'dark');
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+    localStorage.setItem('wanderlust_theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
+
+  // Shared (read-only) map view via ?share=<token>
+  const [sharedOwner, setSharedOwner] = useState<string | null>(null);
+  useEffect(() => {
+    const shareToken = new URLSearchParams(window.location.search).get('share');
+    if (!shareToken) return;
+    fetchSharedMap(shareToken)
+      .then(({ owner, places: sharedPlaces }) => {
+        setPlaces(sharedPlaces);
+        setSharedOwner(owner);
+        window.history.replaceState(null, '', window.location.pathname);
+      })
+      .catch(() => alert('This share link is invalid or expired.'));
+  }, []);
+
+  // Active trip route shown on the map
+  const [activeTripStops, setActiveTripStops] = useState<{ name: string; lat: number; lng: number }[]>([]);
+  const readOnly = sharedOwner !== null;
+
   // Persist to localStorage
   useEffect(() => {
-    localStorage.setItem('wanderlust_places', JSON.stringify(places));
-  }, [places]);
+    if (!readOnly) localStorage.setItem('wanderlust_places', JSON.stringify(places));
+  }, [places, readOnly]);
 
   useEffect(() => {
     if (authToken) {
@@ -60,8 +87,9 @@ const App: React.FC = () => {
   };
 
   const handleMapClick = useCallback((coords: Coordinates) => {
+    if (readOnly) return;
     setModalCoords(coords);
-  }, []);
+  }, [readOnly]);
 
   const handleGenerateRecommendations = async () => {
     if (isGenerating) {
@@ -126,27 +154,44 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden relative bg-slate-100">
+    <div className="flex h-screen w-screen overflow-hidden relative bg-slate-100 dark:bg-slate-950">
       {/* Mobile Sidebar Toggle */}
-      <button 
+      <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="md:hidden absolute top-4 left-4 z-20 bg-white p-2 rounded-lg shadow-md text-slate-700"
+        className="md:hidden absolute top-4 left-4 z-20 bg-white dark:bg-slate-800 p-2 rounded-lg shadow-md text-slate-700 dark:text-slate-200"
       >
         <Menu size={24} />
       </button>
 
+      {/* Shared-view banner */}
+      {readOnly && (
+        <motion.div
+          initial={{ y: -40 }}
+          animate={{ y: 0 }}
+          className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-indigo-600 text-white text-xs font-medium px-4 py-2 rounded-full shadow-lg"
+        >
+          <Eye size={13} />
+          Viewing {sharedOwner}'s shared map (read-only)
+        </motion.div>
+      )}
+
       {/* Sidebar Container */}
-      <div 
+      <div
         className={`
-          fixed md:relative inset-y-0 left-0 z-30 
+          fixed md:relative inset-y-0 left-0 z-30
           transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-96'}
           w-80 md:w-96 shadow-2xl md:shadow-none h-full
         `}
       >
-        <Sidebar 
+        <Sidebar
           places={places}
           selectedPlaceId={selectedPlaceId}
+          authToken={authToken}
+          isDark={isDark}
+          onToggleDark={() => setIsDark(d => !d)}
+          activeTripStops={activeTripStops}
+          onSelectTripStops={setActiveTripStops}
           onPlaceSelect={(id) => {
             setSelectedPlaceId(id);
             if (window.innerWidth < 768) setIsSidebarOpen(false);
@@ -155,6 +200,7 @@ const App: React.FC = () => {
           onGenerateRecommendations={handleGenerateRecommendations}
           isGenerating={isGenerating}
           isLoggedIn={Boolean(authToken)}
+          readOnly={readOnly}
           onOpenLogin={() => openAuthModal('login')}
           onOpenRegister={() => openAuthModal('register')}
           onLogout={handleLogout}
@@ -163,7 +209,7 @@ const App: React.FC = () => {
 
       {/* Sidebar Overlay for Mobile */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="md:hidden fixed inset-0 z-20 bg-black/20 backdrop-blur-sm"
           onClick={() => setIsSidebarOpen(false)}
         />
@@ -171,20 +217,23 @@ const App: React.FC = () => {
 
       {/* Map Container */}
       <div className="flex-1 h-full relative">
-        <WorldMap 
+        <WorldMap
           places={places}
           selectedPlaceId={selectedPlaceId}
+          routeStops={activeTripStops}
           onMapClick={handleMapClick}
           onPlaceSelect={setSelectedPlaceId}
         />
       </div>
 
       {/* Add Place Modal */}
-      <AddPlaceModal 
-        coordinates={modalCoords} 
-        onClose={() => setModalCoords(null)}
-        onAdd={handleAddPlace}
-      />
+      {!readOnly && (
+        <AddPlaceModal
+          coordinates={modalCoords}
+          onClose={() => setModalCoords(null)}
+          onAdd={handleAddPlace}
+        />
+      )}
 
       <AuthModal
         open={isAuthModalOpen}

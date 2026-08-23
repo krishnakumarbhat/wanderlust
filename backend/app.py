@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import os
+import secrets
 from pathlib import Path
 from typing import Any
 
@@ -226,6 +228,275 @@ def demo_recommendations():
 
     results = recommender.recommend(merged_profile, interactions, top_k=top_k)
     return jsonify({"results": results})
+
+
+# ---------------------------------------------------------------------------
+# Community features: sharing, likes, comments, trips, leaderboard, badges
+# ---------------------------------------------------------------------------
+
+def _username(user_id: int) -> str:
+    conn = get_connection()
+    row = conn.execute("SELECT username FROM users WHERE id = ?", (user_id,)).fetchone()
+    conn.close()
+    return row["username"] if row else "traveler"
+
+
+def _like_count(conn, place_key: str) -> int:
+    return conn.execute(
+        "SELECT COUNT(*) AS c FROM place_likes WHERE place_key = ?", (place_key,)
+    ).fetchone()["c"]
+
+
+@app.post("/api/share")
+def create_share():
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    body = request.get_json(silent=True) or {}
+    places = body.get("places", [])
+    if not isinstance(places, list) or not places:
+        return jsonify({"error": "places must be a non-empty list"}), 400
+
+    token = secrets.token_urlsafe(8)
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO shared_maps (token, owner_id, payload) VALUES (?, ?, ?)",
+        (token, user_id, json.dumps(places)),
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({"token": token})
+
+
+@app.get("/api/share/<token>")
+def get_share(token: str):
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM shared_maps WHERE token = ?", (token,)).fetchone()
+    conn.close()
+    if not row:
+        return jsonify({"error": "Share link not found"}), 404
+    return jsonify({"owner": _username(row["owner_id"]), "places": json.loads(row["payload"])})
+
+
+@app.get("/api/places/<place_key>/community")
+def place_community(place_key: str):
+    user_id = get_current_user_id()
+    conn = get_connection()
+    likes = _like_count(conn, place_key)
+    liked_by_me = bool(
+        user_id
+        and conn.execute(
+            "SELECT 1 FROM place_likes WHERE place_key = ? AND user_id = ?", (place_key, user_id)
+        ).fetchone()
+    )
+    comments = [
+        dict(r)
+        for r in conn.execute(
+            """
+            SELECT c.text, c.created_at, u.username
+            FROM comments c JOIN users u ON u.id = c.user_id
+            WHERE c.place_key = ? ORDER BY c.id DESC LIMIT 50
+            """,
+            (place_key,),
+        ).fetchall()
+    ]
+    conn.close()
+    return jsonify({"likes": likes, "liked_by_me": liked_by_me, "comments": comments})
+
+
+@app.post("/api/places/<place_key>/like")
+def toggle_like(place_key: str):
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    conn = get_connection()
+    existing = conn.execute(
+        "SELECT 1 FROM place_likes WHERE place_key = ? AND user_id = ?", (place_key, user_id)
+    ).fetchone()
+    if existing:
+        conn.execute("DELETE FROM place_likes WHERE place_key = ? AND user_id = ?", (place_key, user_id))
+        liked = False
+    else:
+        conn.execute("INSERT INTO place_likes (user_id, place_key) VALUES (?, ?)", (user_id, place_key))
+        liked = True
+    conn.commit()
+    likes = _like_count(conn, place_key)
+    conn.close()
+    return jsonify({"liked": liked, "likes": likes})
+
+
+@app.post("/api/places/<place_key>/comments")
+def add_comment(place_key: str):
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    body = request.get_json(silent=True) or {}
+    text = (body.get("text") or "").strip()
+    if not text or len(text) > 500:
+        return jsonify({"error": "text must be 1-500 characters"}), 400
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO comments (place_key, user_id, text) VALUES (?, ?, ?)",
+        (place_key, user_id, text),
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "ok", "username": _username(user_id)})
+
+
+@app.get("/api/leaderboard")
+def leaderboard():
+    """Most-loved destinations across all users (interactions + likes)."""
+    conn = get_connection()
+    rows = conn.execute(
+        """
+        SELECT place_key, SUM(score) AS total FROM (
+            SELECT place_id AS place_key, COUNT(*) * 2.0 AS score
+            FROM interactions WHERE interaction_type IN ('loved', 'saved')
+            GROUP BY place_id
+            UNION ALL
+            SELECT place_key, COUNT(*) * 1.0 AS score
+            FROM place_likes GROUP BY place_key
+        ) GROUP BY place_key ORDER BY total DESC LIMIT 10
+        """
+    ).fetchall()
+    top_travelers = conn.execute(
+        """
+        SELECT u.username, COUNT(*) AS places
+        FROM interactions i JOIN users u ON u.id = i.user_id
+        GROUP BY i.user_id ORDER BY places DESC LIMIT 5
+        """
+    ).fetchall()
+    conn.close()
+    return jsonify(
+        {
+            "places": [dict(r) for r in rows],
+            "top_travelers": [dict(r) for r in top_travelers],
+        }
+    )
+
+
+@app.get("/api/profile/me")
+def profile_me():
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    conn = get_connection()
+    interactions = conn.execute(
+        "SELECT COUNT(*) AS c FROM interactions WHERE user_id = ?", (user_id,)
+    ).fetchone()["c"]
+    comments = conn.execute(
+        "SELECT COUNT(*) AS c FROM comments WHERE user_id = ?", (user_id,)
+    ).fetchone()["c"]
+    likes_given = conn.execute(
+        "SELECT COUNT(*) AS c FROM place_likes WHERE user_id = ?", (user_id,)
+    ).fetchone()["c"]
+    trips = conn.execute(
+        "SELECT COUNT(*) AS c FROM trips WHERE user_id = ?", (user_id,)
+    ).fetchone()["c"]
+    conn.close()
+
+    badges = []
+    if interactions >= 1:
+        badges.append("First Steps 🌱")
+    if interactions >= 5:
+        badges.append("Explorer 🧭")
+    if interactions >= 15:
+        badges.append("Globetrotter 🌍")
+    if comments >= 1:
+        badges.append("Storyteller 💬")
+    if likes_given >= 3:
+        badges.append("Cheerleader ❤️")
+    if trips >= 1:
+        badges.append("Trip Planner 🗺️")
+
+    return jsonify(
+        {
+            "username": _username(user_id),
+            "stats": {
+                "interactions": interactions,
+                "comments": comments,
+                "likes_given": likes_given,
+                "trips": trips,
+            },
+            "badges": badges,
+        }
+    )
+
+
+@app.post("/api/trips")
+def create_trip():
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    body = request.get_json(silent=True) or {}
+    name = (body.get("name") or "").strip()
+    stops = body.get("stops", [])
+    if not name:
+        return jsonify({"error": "name is required"}), 400
+    if not isinstance(stops, list) or len(stops) < 2:
+        return jsonify({"error": "a trip needs at least 2 stops"}), 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO trips (user_id, name) VALUES (?, ?)", (user_id, name))
+    trip_id = cursor.lastrowid
+    for pos, stop in enumerate(stops):
+        try:
+            cursor.execute(
+                "INSERT INTO trip_stops (trip_id, name, lat, lng, position) VALUES (?, ?, ?, ?, ?)",
+                (trip_id, str(stop["name"]), float(stop["lat"]), float(stop["lng"]), pos),
+            )
+        except (KeyError, TypeError, ValueError):
+            conn.close()
+            return jsonify({"error": f"invalid stop at index {pos}"}), 400
+    conn.commit()
+    conn.close()
+    return jsonify({"trip_id": trip_id})
+
+
+@app.get("/api/trips")
+def list_trips():
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    conn = get_connection()
+    rows = conn.execute(
+        """
+        SELECT t.id, t.name, t.created_at,
+               json_group_array(json_object('name', s.name, 'lat', s.lat, 'lng', s.lng)) AS stops_json
+        FROM trips t LEFT JOIN trip_stops s ON s.trip_id = t.id
+        WHERE t.user_id = ? GROUP BY t.id ORDER BY t.id DESC
+        """,
+        (user_id,),
+    ).fetchall()
+    conn.close()
+    trips = []
+    for r in rows:
+        d = dict(r)
+        d["stops"] = json.loads(d.pop("stops_json"))
+        # LEFT JOIN yields one null row for trips without stops
+        if len(d["stops"]) == 1 and d["stops"][0]["name"] is None:
+            d["stops"] = []
+        trips.append(d)
+    return jsonify({"trips": trips})
+
+
+@app.delete("/api/trips/<int:trip_id>")
+def delete_trip(trip_id: int):
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    conn = get_connection()
+    owner = conn.execute("SELECT user_id FROM trips WHERE id = ?", (trip_id,)).fetchone()
+    if not owner or owner["user_id"] != user_id:
+        conn.close()
+        return jsonify({"error": "Not found"}), 404
+    conn.execute("DELETE FROM trip_stops WHERE trip_id = ?", (trip_id,))
+    conn.execute("DELETE FROM trips WHERE id = ?", (trip_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "ok"})
 
 
 if __name__ == "__main__":

@@ -49,5 +49,62 @@ def init_db() -> None:
         """
     )
 
+    # Community features. place_key is the lowercased place name so likes/comments
+    # aggregate across users even for custom (non-catalog) pins.
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS shared_maps (
+            token TEXT PRIMARY KEY,
+            owner_id INTEGER NOT NULL,
+            payload TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            place_key TEXT NOT NULL,
+            user_id INTEGER NOT NULL,
+            text TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS place_likes (
+            user_id INTEGER NOT NULL,
+            place_key TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, place_key)
+        )
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS trips (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS trip_stops (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            trip_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            lat REAL NOT NULL,
+            lng REAL NOT NULL,
+            position INTEGER NOT NULL,
+            FOREIGN KEY(trip_id) REFERENCES trips(id) ON DELETE CASCADE
+        )
+        """
+    )
+
     conn.commit()
     conn.close()

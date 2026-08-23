@@ -1,6 +1,19 @@
-import { Place, PlaceStatus } from "../types";
+import { Place, PlaceStatus, CommunityInfo, Trip, LeaderboardEntry, ProfileMe } from "../types";
+
+export type { CommunityInfo };
 
 const BACKEND_URL = "http://localhost:5001";
+
+async function api<T>(path: string, options: RequestInit = {}, token?: string | null): Promise<T> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const response = await fetch(`${BACKEND_URL}${path}`, { ...options, headers });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.error || `Request failed (${response.status})`);
+  }
+  return response.json();
+}
 
 interface AuthResponse {
   token: string;
@@ -104,3 +117,45 @@ export const getTravelRecommendations = async (places: Place[]): Promise<any[]> 
 export const getPlaceInfo = async (placeName: string): Promise<string> => {
   return `Tip: ${placeName} is best explored with local food stops and early morning starts.`;
 };
+
+// ---------------------------------------------------------------------------
+// Community API
+// ---------------------------------------------------------------------------
+
+export const shareMap = (places: Place[], token: string) =>
+  api<{ token: string }>("/api/share", { method: "POST", body: JSON.stringify({ places }) }, token);
+
+export const fetchSharedMap = (shareToken: string) =>
+  api<{ owner: string; places: Place[] }>(`/api/share/${encodeURIComponent(shareToken)}`);
+
+export const placeKey = (name: string) => name.trim().toLowerCase();
+
+export const fetchCommunity = (name: string, token?: string | null) =>
+  api<CommunityInfo>(`/api/places/${encodeURIComponent(placeKey(name))}/community`, {}, token);
+
+export const toggleLike = (name: string, token: string) =>
+  api<{ liked: boolean; likes: number }>(
+    `/api/places/${encodeURIComponent(placeKey(name))}/like`,
+    { method: "POST" },
+    token
+  );
+
+export const addComment = (name: string, text: string, token: string) =>
+  api<{ status: string }>(
+    `/api/places/${encodeURIComponent(placeKey(name))}/comments`,
+    { method: "POST", body: JSON.stringify({ text }) },
+    token
+  );
+
+export const fetchLeaderboard = () =>
+  api<{ places: LeaderboardEntry[]; top_travelers: LeaderboardEntry[] }>("/api/leaderboard");
+
+export const fetchProfileMe = (token: string) => api<ProfileMe>("/api/profile/me", {}, token);
+
+export const createTrip = (name: string, stops: Trip["stops"], token: string) =>
+  api<{ trip_id: number }>("/api/trips", { method: "POST", body: JSON.stringify({ name, stops }) }, token);
+
+export const fetchTrips = (token: string) => api<{ trips: Trip[] }>("/api/trips", {}, token);
+
+export const deleteTrip = (id: number, token: string) =>
+  api<{ status: string }>(`/api/trips/${id}`, { method: "DELETE" }, token);

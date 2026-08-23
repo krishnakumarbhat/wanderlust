@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { Place, PlaceStatus, Coordinates } from '../types';
 
 interface WorldMapProps {
   places: Place[];
   selectedPlaceId: string | null;
+  routeStops: { name: string; lat: number; lng: number }[];
   onMapClick: (coords: Coordinates) => void;
   onPlaceSelect: (id: string) => void;
 }
@@ -52,19 +53,22 @@ const MapResizeFix: React.FC = () => {
   return null;
 };
 
-const WorldMap: React.FC<WorldMapProps> = ({ places, selectedPlaceId, onMapClick, onPlaceSelect }) => {
+const WorldMap: React.FC<WorldMapProps> = ({ places, selectedPlaceId, routeStops, onMapClick, onPlaceSelect }) => {
   const selectedPlace = places.find(p => p.id === selectedPlaceId);
   const [isMapReady, setIsMapReady] = useState(false);
 
   const icons = useMemo(() => {
     const createIcon = (status: PlaceStatus, isSelected: boolean) => {
       const color = status === PlaceStatus.VISITED ? '#059669' : '#e11d48';
-      const scale = isSelected ? 'scale(1.2)' : 'scale(1)';
       const shadow = isSelected ? '0 10px 20px rgba(15,23,42,0.25)' : '0 6px 12px rgba(15,23,42,0.2)';
       const glyph = status === PlaceStatus.VISITED ? '✓' : '📍';
+      // Selected pins get a pulsing halo ring
+      const pulse = isSelected
+        ? `<span class="pin-pulse" style="position:absolute;inset:-6px;border-radius:9999px;border:2px solid ${color};"></span>`
+        : '';
 
       return L.divIcon({
-        html: `<div style="width:40px;height:40px;border-radius:9999px;background:#fff;border:2px solid #fff;color:${color};display:flex;align-items:center;justify-content:center;font-size:20px;transform:${scale};box-shadow:${shadow};">${glyph}</div>`,
+        html: `<div style="position:relative;width:40px;height:40px;border-radius:9999px;background:#fff;border:2px solid #fff;color:${color};display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:${shadow};">${pulse}${glyph}</div>`,
         className: 'bg-transparent',
         iconSize: [40, 40],
         iconAnchor: [20, 40],
@@ -107,7 +111,14 @@ const WorldMap: React.FC<WorldMapProps> = ({ places, selectedPlaceId, onMapClick
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
+
+        {routeStops.length >= 2 && (
+          <Polyline
+            positions={routeStops.map(s => [s.lat, s.lng] as [number, number])}
+            pathOptions={{ color: '#6366f1', weight: 3, dashArray: '8 8', opacity: 0.8 }}
+          />
+        )}
+
         <MapEvents onClick={onMapClick} />
         <MapResizeFix />
         <MapFlyTo coords={selectedPlace ? { lat: selectedPlace.lat, lng: selectedPlace.lng } : null} />

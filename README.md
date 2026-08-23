@@ -21,7 +21,12 @@ Most bucket-list apps are static lists. wanderlust puts your travels on a **live
 - 🤖 **Hybrid AI recommender** — Haversine geo-filter → profile constraints → semantic ranking (embeddings + ChromaDB) → weighted scoring, orchestrated by LangGraph
 - 🔍 **Explainable scores** — every recommendation includes its score breakdown
 - 👤 **Auth** — register/login, per-user visited & saved interactions feed back into recommendations
-- 🧪 **Tested** — pytest suite covering the full pipeline
+- 🌗 **Dark mode** — class-based toggle, persisted across sessions
+- 🎬 **Motion design** — spring modals, staggered cards, pulsing map pins (Framer Motion)
+- 🔗 **Trip sharing** — one-click public read-only link to your map
+- ❤️ **Community** — likes & comments on any place, most-loved leaderboard, achievement badges
+- 🧭 **Trip itineraries** — turn your bucket list into a named trip with a dashed route line on the map
+- 🧪 **Tested** — pytest suite covering the pipeline and all community endpoints
 
 ## 🏗️ Architecture
 
@@ -108,6 +113,16 @@ On first boot the backend embeds `backend/data/places.json` into ChromaDB (downl
 | POST   | `/api/recommendations/cascade` | Personalized recommendations | Bearer |
 | POST   | `/api/recommendations/demo` | Recommendations without account | – |
 | POST   | `/api/interactions` | Log `saved` / `loved` interaction | Bearer |
+| POST   | `/api/share` | Create public share link for your map | Bearer |
+| GET    | `/api/share/<token>` | Fetch a shared map (read-only) | – |
+| GET    | `/api/places/<key>/community` | Likes + comments for a place | – |
+| POST   | `/api/places/<key>/like` | Toggle like on a place | Bearer |
+| POST   | `/api/places/<key>/comments` | Comment on a place | Bearer |
+| GET    | `/api/leaderboard` | Most-loved places + top travelers | – |
+| GET    | `/api/profile/me` | Your stats + badges | Bearer |
+| POST   | `/api/trips` | Create trip from bucket-list stops | Bearer |
+| GET    | `/api/trips` | List your trips (with route stops) | Bearer |
+| DELETE | `/api/trips/<id>` | Delete a trip | Bearer |
 
 ## 📁 Project Structure
 
@@ -131,11 +146,12 @@ wanderlust/
 
 | Feature | Status |
 | ------- | ------ |
-| Trip sharing links (`/trip/:id`) | planned · `good first issue` |
-| Comments & likes on places | planned |
-| Multi-day itineraries with route lines | planned |
-| Leaderboards & achievement badges | planned |
-| Dark mode + motion polish | planned |
+| Trip sharing links (`?share=<token>`) | ✅ shipped |
+| Comments & likes on places | ✅ shipped |
+| Multi-day trip itineraries with dashed route lines | ✅ shipped |
+| Leaderboards & achievement badges | ✅ shipped |
+| Dark mode + motion polish (Framer Motion, pulsing pins) | ✅ shipped |
+| GPX export | planned · `good first issue` |
 
 Want to claim one? Check [CONTRIBUTING.md](CONTRIBUTING.md).
 

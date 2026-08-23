@@ -24,3 +24,41 @@ export interface AIRecommendation {
   lat: number;
   lng: number;
 }
+
+export interface Comment {
+  username: string;
+  text: string;
+  created_at: string;
+}
+
+export interface CommunityInfo {
+  likes: number;
+  liked_by_me: boolean;
+  comments: Comment[];
+}
+
+export interface TripStop {
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+export interface Trip {
+  id: number;
+  name: string;
+  created_at?: string;
+  stops?: number;
+}
+
+export interface LeaderboardEntry {
+  place_key: string;
+  total?: number;
+  username?: string;
+  places?: number;
+}
+
+export interface ProfileMe {
+  username: string;
+  stats: { interactions: number; comments: number; likes_given: number; trips: number };
+  badges: string[];
+}
